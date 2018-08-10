@@ -1,0 +1,66 @@
+<head>
+    <title>Kibo Jira Manage</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <style>
+    #form {
+    text-align: center;
+    margin: auto;
+    margin-top:80px;
+    position: relative;
+    }
+    #container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    input, input[placeholder]{
+        text-align:center;
+    }
+
+    #input {
+        font-size:14pt;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin:40px;
+        text-align: center;
+    }
+
+    .btn-lg {
+        padding: 10px 10px;
+        font-size: 30px;
+        border-radius: 10px;
+        width:10%;
+    }
+    a:hover {
+        color: green;
+    }
+    
+    </style>
+</head>
+
+<body>
+
+<div id="form">
+    <form class="form-signin" method="post" id="login-form">
+    {% csrf_token %}
+    <h1><span style="color:#FFCE01;">KI</span><span style="color:#656868;">BO</span>&nbsp;Jira Manage</h1>
+    <p><font color='red'><strong>{{message}}</strong></font></p>
+    <div id="container">
+    <div id ="input">
+    <label for="username" >Jira Username: </label>
+    <input id="username" type="text" size="25" name="username" placeholder="jira username"  title="firstname.lastname@kibocommerce.com" required autofocus>
+    <br>
+    <label for="password" >Jira Password: </label>
+    <input id="password" type="password" size="25" name="password" required autofocus>
+    </div>
+    <button class="btn btn-lg btn-primary glyphicon glyphicon-log-in " type="submit" name="login"></button>
+    </div>
+    </form>
+</div>
+</body>
+

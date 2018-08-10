@@ -1,0 +1,271 @@
+{% load app_tags %}
+<head>
+    <title>Manage Issues</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <script
+        src="http://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+
+    <style>
+    .tablediv {
+        padding: 0 75px;
+    }
+    .table {
+        text-align: center;
+    }
+    
+    th {
+        text-align: center;
+    }
+    #back {
+        text-align: left;
+    }
+    .button-hidden {
+        display: none;
+    }
+    .update-btn {
+        display: none;
+        float:right;
+    }
+    #page {
+        text-align: center;
+    }
+    #top {
+        text-align: center;
+    }
+    </style>
+</head>
+
+<body>
+
+    <div id="form">
+    <form class="form-signin" method="post" id="issuehomeform" name="issuehomeform">
+    {% csrf_token %}
+    {% if message %}
+        {{message}}
+        <a id="back" href="{% url 'homepage' %}" class="btn btn-md btn-default">Enter your Jira Credential</a>
+    {% else %}
+        <div id = "top">
+        <p style="color:red;">Hints: a) To ensure the query spped of this app, maxResults from jira are limit to 1000</p>
+        <p style="color:red;">b) Update values before goes to next page</p>
+        <h4><span style="color:#555555;">{{ keys.number}}</span> of {{keys.paginator.num_pages}}</h4>
+        </div>
+        <a id="back" href="{% url 'filter' %}" class="btn btn-md btn-default">Go Back Filter</a>
+        <div class="tablediv">
+        <table class="table table-sm table-hover table-responsive" align="center">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Key</th>
+                <th>Summary</th>
+                <th>Epic Link</th>
+                <th>Type of work</th>
+                <th>Billable?</th>
+                <th>ClientName</th>
+            </tr>
+            <button class="update-btn btn btn-primary btn-sm" name='update-btn-value' value = 'Update-btn-value' >Update Data</button>
+        </thead>
+        <tbody>
+            {% for k in keys %}
+            <tr id="row{{k}}">
+                    {% get_values k issuedic as values %}
+                    <td>
+                        <p>{{ forloop.counter }}</p>
+                    </td>
+                    <td>
+                        <a href='https://jira.kibocommerce.com/browse/{{k}}' target="_blank">{{k}}</a>
+                    </td>
+                        {% for item in values %}
+                    <td>
+                        {%convert forloop.counter0 as counter %}
+                            {% if counter == 1 %}
+                                {% if item == "N/A" %}
+                                    {{item}}
+                                {% else %}
+                                    <a href='https://jira.kibocommerce.com/browse/{{item}}' target="_blank">{{item}}</a>  
+                                {% endif %}                             
+                            {% elif counter == 2 %}
+                                <select class="select1" value={{k}}>
+                                {% if item == "None" %} 
+                                    <option value={{item}} selected disabled hidden>{{item}}</option>  
+                                {% endif %}
+                                {% for tw in twdropdown %}
+                                    
+                                    {% if tw == item %}
+                                        <option value={{tw}} selected>{{tw}}</option>
+                                    {% else %}
+                                        <option value={{tw}}>{{tw}}</option>
+                                    {% endif %}
+                                
+                                {% endfor %}
+                                </select>
+                            {% elif counter == 3 %}
+                            <select class="select2" value={{k}}>
+                                    {% if item == "None" %} 
+                                        <option value={{item}} selected disabled hidden>{{item}}</option>  
+                                    {% endif %}
+                                    {% for ba in badropdown %}
+                                    
+                                    {% if ba == item %}
+                                    <option value={{ba}} selected>{{ba}}</option>
+                                    {% else %}
+                                    <option value={{ba}}>{{ba}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            {% elif counter == 4 %}
+                                <select class="select3" value={{k}}>
+                                {% if item == "None" %} 
+                                    <option value={{item}} selected disabled hidden>{{item}}</option>  
+                                {% endif %}
+                                {% for cn in clientname_dropdown %}
+                                    
+                                    {% if cn == item %}
+                                        <option value={{cn}} selected>{{cn}}</option>
+                                    {% else %}
+                                        <option value={{cn}}>{{cn}}</option>
+                                    {% endif %}
+                                
+                                {% endfor %}
+                                </select>
+                            {% else %}
+                                {{item}}
+                            {% endif %}
+                    </td>
+                        {% endfor %}
+                        <td>
+                        <label id="update-row{{k}}" class="button-hidden">Update<input class="update-check" id="update-row-checkbox{{k}}" value="{{k}}" type="checkbox"></input></label>
+                        </td>   
+                </tr>
+             {% endfor %}
+         </tbody>
+        </table>
+        <div id="page">
+        {% if keys.has_other_pages %}
+            <ul class="pagination">
+            {% if keys.has_previous %}
+                <li><a href="?page={{ keys.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in keys.paginator.page_range %}
+                {% if keys.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if keys.has_next %}
+                <li><a href="?page={{ keys.next_page_number }}">&raquo;</a></li>
+            {% else %}
+                <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+            </ul>
+        {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    </form>
+</div>
+
+<script>
+        $("body").on("click", "select", function(event){
+            var key = $(event.currentTarget).attr("value");
+            $("#update-row"+key).removeClass("button-hidden");
+            $("#update-row-checkbox"+key).attr('checked', true);
+            $(".update-btn").show();
+
+        });
+        $("body").on("keydown", "select", function(event){
+            var keyCode = event.keyCode || event.which;
+            if(keyCode == 9) {
+                var key = $(event.currentTarget).attr("value");
+                $("#update-row"+key).removeClass("button-hidden");
+                $("#update-row-checkbox"+key).attr('checked', true);
+                $(".update-btn").show();  
+            }
+        });
+
+        $(".update-btn").on("click", function(event){
+            event.preventDefault();
+            var selected = [];
+            var update_results= [];
+
+            $("input:checkbox").each(function(i,l){
+                if($(this).is(':checked'))
+                {
+                    selected.push($(this).attr('value'));
+                }
+            });
+        
+            $.each( selected, function( i, l ){
+            //alert( "Index #" + i + ": " + l );
+            var twvalue  = $("#row"+l).find($(".select1 option:selected")).text();
+            var bavalue  = $("#row"+l).find($(".select2 option:selected")).text();
+            var cnvalue  = $("#row"+l).find($(".select3 option:selected")).text();
+
+            update_results.push([l,twvalue,bavalue,cnvalue]);
+             });
+
+            $.ajax({type: 'POST',
+                url: '/issuehome/',                            // some data url
+                data: {'param[]': update_results},       // some params  
+                success: function (response) {
+                    alert("Update succesed");                  // callback
+                    location.reload();
+                if (response.result === 'OK') {
+                    if (response.data && typeof(response.data) === 'object') {
+                    // do something with the successful response.data
+                    // e.g. response.data can be a JSON object
+                        
+                    }
+                } 
+                else {
+                // handle an unsuccessful response
+                }}});
+ 
+            $( "label[id^='update-row']" ).addClass("button-hidden");
+            $(".update-btn").hide();;
+        });
+        // CSRF code
+        function getCookie(name) {
+            var cookieValue = null;
+            var i = 0;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (i; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            crossDomain: false, // obviates need for sameOrigin test
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type)) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+        
+</script>
+
+</body>
+
+
+
+
+

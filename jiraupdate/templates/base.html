@@ -1,0 +1,25 @@
+{% load staticfiles %}
+<head>
+    <title>Kibo Jira Manage</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="{% static 'css/kibo.css' %}">
+
+</head>
+
+<body>
+    <div class="page-header">
+        <div id ="login">
+        {% url 'login' as login_page %}
+        {% if request.path != login_page %}
+        {% if user.is_authenticated %}
+            <h1 class="top-menu">Hello {{ user.username }} <small>(<a href="{% url 'logout' %}">Log out</a>)</small></h1>
+        {% else %}
+            <a id="admin" href="{% url 'login' %}" class="top-menu"><span class="glyphicon glyphicon-lock"></span></a>
+        {% endif %}
+        {% endif %}
+        </div>
+    </div>
+        {% block content %}
+        {% endblock %}
+</body>
